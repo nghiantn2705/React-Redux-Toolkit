@@ -10,7 +10,7 @@ import {
     persistStore,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { productReducer } from '../features/product/product';
+import productAPI, { productReducer } from '../api/product';
 // import { counterReducer } from '../slices/Count';
 
 // import { cartReducer } from '@/slices/cart';
@@ -19,11 +19,11 @@ import { productReducer } from '../features/product/product';
 const persistConfig = {
     key: 'root',
     storage,
-    blacklist: ['products', 'counter']
+    blacklist: ['counter']
 }
 const rootReducer = combineReducers({
     // counter: counterReducer,
-    products: productReducer,
+    [productAPI.reducerPath]: productReducer
     // cart: cartReducer
 })
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -31,11 +31,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 export const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-            },
-        }),
+    getDefaultMiddleware({
+        serializableCheck: {
+            ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+    }).concat(productAPI.middleware),
 });
 export type AppDispatch = typeof store.dispatch
 export type RootState = ReturnType<typeof store.getState>
