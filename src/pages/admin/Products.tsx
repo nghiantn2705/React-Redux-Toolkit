@@ -4,7 +4,7 @@ import {
 } from "../../api/product";
 import { Button, Table, Popconfirm, Input, Space } from "antd";
 import { Link } from "react-router-dom";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineLoading3Quarters,AiOutlineSearch } from "react-icons/ai";
 import { IProduct } from "../../interface/product";
 import type { ColumnType, ColumnsType } from 'antd/es/table';
 import type { FilterConfirmProps } from 'antd/es/table/interface';
@@ -24,56 +24,13 @@ const Products = () => {
       desc,
     };
   });
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: ({ key: id }: any) => {
-        return (
-          <>
-            <Popconfirm
-              placement="topLeft"
-              title={"Bạn có muốn xoá sản phẩm?"}
-              onConfirm={() => confirm(id)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button>
-                {isDeleteLoading ? (
-                  <AiOutlineLoading3Quarters className="animate-spin" />
-                ) : (
-                  "Delete"
-                )}
-              </Button>
-            </Popconfirm>
-            <Button type="primary" danger className="ml-2">
-              <Link to={`/admin/product/${id}/edit`}>Edit</Link>
-            </Button>
-          </>
-        );
-      },
-    },
-  ];
-  const confirm = (id: any) => {
-    deleteProduct(id);
-  };
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef<InputRef>(null);
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex,
+    dataIndex: dataSource,
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -84,7 +41,7 @@ const Products = () => {
     clearFilters();
     setSearchText('');
   };
-  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<DataType> => ({
+  const getColumnSearchProps = (dataIndex: dataSource): ColumnType<dataSource> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -99,7 +56,7 @@ const Products = () => {
           <Button
             type="primary"
             onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
+            icon={<AiOutlineSearch />}
             size="small"
             style={{ width: 90 }}
           >
@@ -136,7 +93,7 @@ const Products = () => {
       </div>
     ),
     filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+      <AiOutlineSearch style={{ color: filtered ? '#1677ff' : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -148,19 +105,58 @@ const Products = () => {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      ) : (
-        text
-      ),
   });
 
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      ...getColumnSearchProps('name')
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+    },
+    {
+      title: "Desc",
+      dataIndex: "desc",
+      key: "desc",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: ({ key: id }: any) => {
+        return (
+          <>
+            <Popconfirm
+              placement="topLeft"
+              title={"Bạn có muốn xoá sản phẩm?"}
+              onConfirm={() => confirm(id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button>
+                {isDeleteLoading ? (
+                  <AiOutlineLoading3Quarters className="animate-spin" />
+                ) : (
+                  "Delete"
+                )}
+              </Button>
+            </Popconfirm>
+            <Button type="primary" danger className="ml-2">
+              <Link to={`/admin/product/${id}/edit`}>Edit</Link>
+            </Button>
+          </>
+        );
+      },
+    },
+  ];
+  const confirm = (id: any) => {
+    deleteProduct(id);
+  };
+  
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-4">

@@ -1,6 +1,8 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import Products from "./pages/admin/Products";
 import LayoutAdmin from "./LayOut/LayoutAdmin";
+import ProductAdd from "./pages/admin/addProduct";
+import ProductEdit from "./pages/admin/editProduct";
 
 
 export const router = createBrowserRouter([
@@ -36,6 +38,15 @@ export const router = createBrowserRouter([
             {
                 path: "product",
                 element: <Products/>,
+            },
+            {
+                path: "product/add",
+                element: <ProductAdd/>,
+            },
+            
+            {
+                path: "product/:id/edit",
+                element: <ProductEdit/>,
             },
         ],
     },
